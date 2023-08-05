@@ -45,6 +45,8 @@ class Node extends PVector {
 
     Node(PVector theVector) {
         x = theVector.x;
+        y = theVector.y;
+        z = theVector.z;
     }
 }
 
