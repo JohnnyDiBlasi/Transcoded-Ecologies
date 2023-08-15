@@ -128,10 +128,109 @@ void loop() {
     will be focused on the V and W channels primarily..
     */
     if (spectralSensor.getVersion() == SENSORTYPE_AS7263) {
-        theData[5];
+        theData[5] = spectralSensor.getCalibratedV();
     }
 
     //-----------------------Sensor Loop-----------------------------------
+    if (theCCS.dataAvailable()) {
+        theCCS.readAlgorithmResults();
+        theData[0] = theCCS.getCO2();
+        theData[1] = theBME.readTempF();
+        theData[2] = theBME.readFloatPressure();
+        theData[3] = theBME.readFloatHumidity();
+    }
+    else if (theCCS.checkForStatusError()) {
+        Serial.println(theCCS.getErrorRegister());
+    }
+
+    //idx: 0=co2, 1=temp, 2=pressure, 3=humidity, 4=touch 
+    switch (idx) {
+        case 0:
+            Serial.print(co2);
+            Serial.println(theData[idx]);
+            if (theData[idx] > 300) {
+                theTime = int(map(theData[0], 300,700, 1200,3500));
+            }
+            else {
+                theTime = 2000;
+            }
+            break;
+        case 1:
+            Serial.print(temp);
+            Serial.println(theData[idx]);
+            if (theData[idx] > 60) {
+                red = uint16_t(map(theData[1], 60,100, 80,255));
+                green = uint16_t(map(theData[1], 60,100, 80,180));
+            }
+            else {
+                red = uint16_t(map(theData[1], 10,60, 0,60));
+                green = uint16_t(map(theData[1], 10,60, 255,180));
+                blue = 255;
+            }
+            break;
+        case 2:
+            Serial.print(pressure);
+            Serial.println(theData[idx]);
+            green = uint16_t(map(theData[2], 98000,100000, 40,180));
+            if (green > 255 || green < 0) green = 255;
+            break;
+        case 3:
+            Serial.print(humidity);
+            Serial.println(theData[idx]);
+            if (theData[idx] > 50) {
+                blue = uint16_t(map(theData[3], 50,90, 150,255));
+                red = 20;
+                green = uint16_t(map(theData[3], 50,90, 150,255));
+            }
+            else {
+                blue = uint16_t(map(theData[3], 0,50, 0,80));
+                green = 255;
+                red = 0;
+            }
+            break;
+        case 4:
+            Serial.print(touch);
+            Serial.println(theData[idx]);
+            break;
+    }
+
+    idx++;
+    if (idx > 4) idx = 0;
+
+    //Safety: Constraining the COLOR Values
+    if (red < 0) {
+        red = 40;
+    }
+    else if (red > 255) {
+        red = 255;
+    }
+
+    if (green < 0) {
+        green = 0;
+    }
+    else if (green > 255) {
+        green = 255;
+    }
+
+    if (blue < 0) {
+        blue = 0;
+    }
+    else if (blue > 255) {
+        blue = 255;
+    }
+
+    //--------------------------- DotStar Loop--------------------------------
+    strip.setPixelColor(head, green, red, blue);
+    strip.setPixelColor(tail, 0);
+    strip.show();
+    delay(20);
+
+    if (++head >= NUMPIXELS) {
+        head = 0;
+    }
+    if (++tail >= NUMPIXELS) {
+        tail = 0;
+    }
 }
 
 
