@@ -1,3 +1,4 @@
+
 import time
 import math
 import numpy as np
@@ -17,8 +18,8 @@ dots = dotstar.DotStar(board.SCK, board.MOSI, LED_COUNT, brightness=BRIGHTNESS)
 
 def generate_continuous_wave():
     """Generate a continuous sine wave."""
-    t = np.arange(BUFFER_SIZE) / SAMPLE_RATE
-    return 0.5 * np.sin(2 * np.pi * FREQUENCY * t)
+    t = np.arange(BUFFER_SIZE, dtype=np.float32) / SAMPLE_RATE
+    return np.float32(0.5 * np.sin(2 * np.pi * FREQUENCY * t))
 
 def update_leds(amplitude):
     """Update LED colors based on sound amplitude."""
