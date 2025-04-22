@@ -10,29 +10,15 @@ SAMPLE_RATE = 44100
 FREQUENCY = 440  # Hz (A4 note)
 LED_COUNT = 120
 BRIGHTNESS = 0.4
-CHUNK_SIZE = 1024  # Number of samples per callback
+BUFFER_SIZE = 44100  # 1 second of audio
 
 # Initialize DotStar LED strip
 dots = dotstar.DotStar(board.SCK, board.MOSI, LED_COUNT, brightness=BRIGHTNESS)
 
-# Global variables for audio generation
-phase = 0
-amplitude = 0.5
-
-def audio_callback(outdata, frames, time, status):
-    """Callback function for continuous audio generation."""
-    global phase
-    if status:
-        print(status)
-    
-    # Generate continuous sine wave
-    t = (phase + np.arange(frames)) / SAMPLE_RATE
-    t = t.reshape(-1, 1)
-    outdata[:] = amplitude * np.sin(2 * np.pi * FREQUENCY * t)
-    phase += frames
-    
-    # Update LEDs based on current amplitude
-    update_leds(outdata[0][0])
+def generate_continuous_wave():
+    """Generate a continuous sine wave."""
+    t = np.arange(BUFFER_SIZE) / SAMPLE_RATE
+    return 0.5 * np.sin(2 * np.pi * FREQUENCY * t)
 
 def update_leds(amplitude):
     """Update LED colors based on sound amplitude."""
@@ -54,20 +40,35 @@ def main():
     
     try:
         print("Starting continuous audio and LED control...")
-        # Start the audio stream with callback
-        with sd.OutputStream(channels=1,
-                           samplerate=SAMPLE_RATE,
-                           blocksize=CHUNK_SIZE,
-                           callback=audio_callback):
-            print("Press Ctrl+C to stop")
-            while True:
-                time.sleep(0.1)  # Keep the main thread alive
+        
+        # Generate the continuous wave
+        samples = generate_continuous_wave()
+        
+        # Start the audio stream
+        stream = sd.OutputStream(
+            samplerate=SAMPLE_RATE,
+            channels=1,
+            dtype='float32'
+        )
+        stream.start()
+        
+        print("Press Ctrl+C to stop")
+        
+        # Continuous playback loop
+        while True:
+            stream.write(samples)
+            # Update LEDs based on the current sample
+            update_leds(samples[0])
+            time.sleep(0.01)  # Small delay to prevent CPU overload
             
     except KeyboardInterrupt:
         print("\nStopping...")
     except Exception as e:
         print(f"Error: {str(e)}")
     finally:
+        if 'stream' in locals():
+            stream.stop()
+            stream.close()
         # Turn off all LEDs
         dots.fill((0, 0, 0))
         dots.show()
