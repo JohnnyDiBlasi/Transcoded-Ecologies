@@ -15,6 +15,9 @@ BUFFER_SIZE = 44100  # 1 second of audio
 # Initialize DotStar LED strip
 print("Initializing LED strip...")
 dots = dotstar.DotStar(board.SCK, board.MOSI, LED_COUNT, brightness=BRIGHTNESS)
+# Initialize all LEDs to off
+dots.fill((0, 0, 0))
+dots.show()
 print("LED strip initialized")
 
 def generate_continuous_wave():
@@ -26,9 +29,9 @@ def update_leds(amplitude, position):
     """Update LED colors based on sound amplitude."""
     try:
         brightness = int(abs(amplitude) * 255)
-        # Only print every 100 updates to reduce console output
-        if position % 100 == 0:
-            print(f"Updating LEDs - Amplitude: {amplitude}, Brightness: {brightness}, Position: {position}")
+        # Only print every 1000 updates to reduce console output
+        if position % 1000 == 0:
+            print(f"Updating LEDs - Position: {position}")
         
         # Update all LEDs
         for i in range(LED_COUNT):
@@ -69,18 +72,19 @@ def main():
         # Continuous playback loop
         position = 0
         sample_index = 0
+        last_led_update = time.time()
         
         while True:
             # Play audio
             stream.write(samples)
             
-            # Update LEDs using a sample from the buffer
-            sample_index = (sample_index + 1) % len(samples)
-            update_leds(samples[sample_index], position)
-            position = (position + 1) % LED_COUNT
-            
-            # Reduced sleep time to make audio smoother
-            time.sleep(0.001)
+            # Update LEDs less frequently to reduce audio interference
+            current_time = time.time()
+            if current_time - last_led_update >= 0.05:  # Update LEDs every 50ms
+                sample_index = (sample_index + 1) % len(samples)
+                update_leds(samples[sample_index], position)
+                position = (position + 1) % LED_COUNT
+                last_led_update = current_time
             
     except KeyboardInterrupt:
         print("\nStopping...")
