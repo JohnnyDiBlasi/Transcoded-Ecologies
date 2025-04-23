@@ -1,4 +1,3 @@
-
 import time
 import math
 import numpy as np
@@ -31,15 +30,19 @@ def update_leds():
     global current_amplitude
     time_offset = 0
     while running:
-        # Map amplitude to LED brightness
-        brightness = int(abs(current_amplitude) * 255)
-        for i in range(LED_COUNT):
-            # Create a moving wave effect
-            position = (i + int(time.time() * 10 + time_offset)) % LED_COUNT
-            dots[position] = (brightness, 0, 0)  # Red color
-        dots.show()  # Make sure to show the changes
-        time_offset += 0.1  # Increment time offset for wave movement
-        time.sleep(0.01)  # Small delay to control LED update rate
+        try:
+            # Map amplitude to LED brightness
+            brightness = int(abs(current_amplitude) * 255)
+            for i in range(LED_COUNT):
+                # Create a moving wave effect
+                position = (i + int(time.time() * 10 + time_offset)) % LED_COUNT
+                dots[position] = (brightness, 0, 0)  # Red color
+            dots.show()  # Make sure to show the changes
+            time_offset += 0.1  # Increment time offset for wave movement
+            time.sleep(0.01)  # Small delay to control LED update rate
+        except Exception as e:
+            print(f"LED update error: {str(e)}")
+            continue
 
 def main():
     global current_amplitude, running
@@ -67,7 +70,7 @@ def main():
         stream.start()
         
         # Start LED update thread
-        led_thread = threading.Thread(target=update_leds)
+        led_thread = threading.Thread(target=update_leds, daemon=True)
         led_thread.start()
         
         print("Press Ctrl+C to stop")
@@ -77,6 +80,7 @@ def main():
             stream.write(samples)
             # Update the current amplitude for LED control
             current_amplitude = samples[0]
+            time.sleep(0.001)  # Small delay to prevent CPU overload
             
     except KeyboardInterrupt:
         print("\nStopping...")
@@ -93,7 +97,7 @@ def main():
         dots.show()
         # Wait for LED thread to finish
         if 'led_thread' in locals():
-            led_thread.join()
+            led_thread.join(timeout=1.0)
 
 if __name__ == "__main__":
     main()
