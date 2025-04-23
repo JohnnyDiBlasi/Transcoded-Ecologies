@@ -80,7 +80,7 @@ def main():
             
             # Update LEDs less frequently to reduce audio interference
             current_time = time.time()
-            if current_time - last_led_update >= 0.1:  # Update LEDs every 100ms
+            if current_time - last_led_update >= 2.0:  # Update LEDs every 2 seconds
                 sample_index = (sample_index + 1) % len(samples)
                 update_leds(samples[sample_index], position)
                 position = (position + 1) % LED_COUNT
