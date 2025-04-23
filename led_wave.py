@@ -5,6 +5,7 @@ import sounddevice as sd
 import board
 import adafruit_dotstar as dotstar
 import threading
+from queue import Queue
 
 # Constants
 SAMPLE_RATE = 44100
@@ -17,8 +18,8 @@ BUFFER_SIZE = 44100  # 1 second of audio
 dots = dotstar.DotStar(board.SCK, board.MOSI, LED_COUNT, brightness=BRIGHTNESS)
 
 # Global variables for LED control
-current_amplitude = 0
 running = True
+amplitude_queue = Queue()
 
 def generate_continuous_wave():
     """Generate a continuous sine wave."""
@@ -27,25 +28,33 @@ def generate_continuous_wave():
 
 def update_leds():
     """Update LED colors based on sound amplitude."""
-    global current_amplitude
-    time_offset = 0
+    global running
+    position = 0
+    
     while running:
         try:
-            # Map amplitude to LED brightness
-            brightness = int(abs(current_amplitude) * 255)
-            for i in range(LED_COUNT):
-                # Create a moving wave effect
-                position = (i + int(time.time() * 10 + time_offset)) % LED_COUNT
-                dots[position] = (brightness, 0, 0)  # Red color
-            dots.show()  # Make sure to show the changes
-            time_offset += 0.1  # Increment time offset for wave movement
-            time.sleep(0.01)  # Small delay to control LED update rate
+            # Get the latest amplitude from the queue
+            if not amplitude_queue.empty():
+                amplitude = amplitude_queue.get()
+                brightness = int(abs(amplitude) * 255)
+                
+                # Update all LEDs
+                for i in range(LED_COUNT):
+                    # Create a moving wave effect
+                    pos = (i + position) % LED_COUNT
+                    dots[pos] = (brightness, 0, 0)
+                
+                dots.show()
+                position = (position + 1) % LED_COUNT
+            
+            time.sleep(0.01)  # Small delay to control update rate
+            
         except Exception as e:
             print(f"LED update error: {str(e)}")
             continue
 
 def main():
-    global current_amplitude, running
+    global running
     
     # List available audio devices
     print("Available audio devices:")
@@ -78,8 +87,8 @@ def main():
         # Continuous playback loop
         while running:
             stream.write(samples)
-            # Update the current amplitude for LED control
-            current_amplitude = samples[0]
+            # Put the current amplitude in the queue
+            amplitude_queue.put(samples[0])
             time.sleep(0.001)  # Small delay to prevent CPU overload
             
     except KeyboardInterrupt:
