@@ -61,7 +61,7 @@ def main():
         # Start the audio stream
         stream = sd.OutputStream(
             samplerate=SAMPLE_RATE,
-            channels=2,
+            channels=1,
             dtype='float32'
         )
         stream.start()
