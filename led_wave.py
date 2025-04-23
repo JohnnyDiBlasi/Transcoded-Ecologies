@@ -14,6 +14,7 @@ BUFFER_SIZE = 44100  # 1 second of audio
 
 # Initialize DotStar LED strip
 print("Initializing LED strip...")
+print(f"LED_COUNT: {LED_COUNT}")
 dots = dotstar.DotStar(board.SCK, board.MOSI, LED_COUNT, brightness=BRIGHTNESS)
 # Initialize all LEDs to off
 dots.fill((0, 0, 0))
@@ -32,6 +33,9 @@ def update_leds(amplitude, position):
         # Only print every 1000 updates to reduce console output
         if position % 1000 == 0:
             print(f"Updating LEDs - Position: {position}")
+            # Print the first and last few LED positions to verify updates
+            print(f"First few LEDs: {[dots[i] for i in range(5)]}")
+            print(f"Last few LEDs: {[dots[i] for i in range(LED_COUNT-5, LED_COUNT)]}")
         
         # Update all LEDs
         for i in range(LED_COUNT):
