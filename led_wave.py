@@ -11,6 +11,7 @@ FREQUENCY = 440  # Hz (A4 note)
 LED_COUNT = 144  # Updated to 144 LEDs per meter
 BRIGHTNESS = 0.4
 BUFFER_SIZE = 44100  # 1 second of audio
+BLOCK_SIZE = 1024  # Smaller block size for audio
 
 # Initialize DotStar LED strip
 print("Initializing LED strip...")
@@ -58,11 +59,12 @@ def main():
         samples = generate_continuous_wave()
         print("Generated audio samples")
         
-        # Start the audio stream
+        # Start the audio stream with smaller block size
         stream = sd.OutputStream(
             samplerate=SAMPLE_RATE,
             channels=1,
-            dtype='float32'
+            dtype='float32',
+            blocksize=BLOCK_SIZE
         )
         stream.start()
         print("Audio stream started")
@@ -75,16 +77,22 @@ def main():
         last_led_update = time.time()
         
         while True:
-            # Play audio
-            stream.write(samples)
-            
-            # Update LEDs less frequently to reduce audio interference
-            current_time = time.time()
-            if current_time - last_led_update >= 0.05:  # Update LEDs every 50ms
-                sample_index = (sample_index + 1) % len(samples)
-                update_leds(samples[sample_index], position)
-                position = (position + 1) % LED_COUNT
-                last_led_update = current_time
+            # Play audio in smaller chunks
+            for i in range(0, len(samples), BLOCK_SIZE):
+                chunk = samples[i:i + BLOCK_SIZE]
+                if len(chunk) > 0:
+                    stream.write(chunk)
+                
+                # Update LEDs less frequently to reduce audio interference
+                current_time = time.time()
+                if current_time - last_led_update >= 0.05:  # Update LEDs every 50ms
+                    sample_index = (sample_index + 1) % len(samples)
+                    update_leds(samples[sample_index], position)
+                    position = (position + 1) % LED_COUNT
+                    last_led_update = current_time
+                
+                # Small delay to prevent CPU overload
+                time.sleep(0.001)
             
     except KeyboardInterrupt:
         print("\nStopping...")
