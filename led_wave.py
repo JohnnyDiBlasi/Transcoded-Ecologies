@@ -67,12 +67,16 @@ def main():
         
         # Continuous playback loop
         position = 0
+        sample_index = 0  # Track which sample we're using
+        
         while True:
             # Play audio
             stream.write(samples)
             
-            # Update LEDs
-            update_leds(samples[0], position)
+            # Update LEDs using a sample from the middle of the buffer
+            # This ensures we get a non-zero amplitude
+            sample_index = (sample_index + 1) % len(samples)
+            update_leds(samples[sample_index], position)
             position = (position + 1) % LED_COUNT
             
             # Small delay to control update rate
