@@ -26,15 +26,16 @@ def update_leds(amplitude, position):
     """Update LED colors based on sound amplitude."""
     try:
         brightness = int(abs(amplitude) * 255)
-        print(f"Updating LEDs - Amplitude: {amplitude}, Brightness: {brightness}, Position: {position}")
+        # Only print every 100 updates to reduce console output
+        if position % 100 == 0:
+            print(f"Updating LEDs - Amplitude: {amplitude}, Brightness: {brightness}, Position: {position}")
         
+        # Update all LEDs
         for i in range(LED_COUNT):
-            # Create a moving wave effect
             pos = (i + position) % LED_COUNT
             dots[pos] = (brightness, 0, 0)
         
         dots.show()
-        print("LEDs updated successfully")
     except Exception as e:
         print(f"Error updating LEDs: {str(e)}")
 
@@ -67,20 +68,19 @@ def main():
         
         # Continuous playback loop
         position = 0
-        sample_index = 0  # Track which sample we're using
+        sample_index = 0
         
         while True:
             # Play audio
             stream.write(samples)
             
-            # Update LEDs using a sample from the middle of the buffer
-            # This ensures we get a non-zero amplitude
+            # Update LEDs using a sample from the buffer
             sample_index = (sample_index + 1) % len(samples)
             update_leds(samples[sample_index], position)
             position = (position + 1) % LED_COUNT
             
-            # Small delay to control update rate
-            time.sleep(0.01)
+            # Reduced sleep time to make audio smoother
+            time.sleep(0.001)
             
     except KeyboardInterrupt:
         print("\nStopping...")
