@@ -13,7 +13,9 @@ BRIGHTNESS = 0.4
 BUFFER_SIZE = 44100  # 1 second of audio
 
 # Initialize DotStar LED strip
+print("Initializing LED strip...")
 dots = dotstar.DotStar(board.SCK, board.MOSI, LED_COUNT, brightness=BRIGHTNESS)
+print("LED strip initialized")
 
 def generate_continuous_wave():
     """Generate a continuous sine wave."""
@@ -22,12 +24,19 @@ def generate_continuous_wave():
 
 def update_leds(amplitude, position):
     """Update LED colors based on sound amplitude."""
-    brightness = int(abs(amplitude) * 255)
-    for i in range(LED_COUNT):
-        # Create a moving wave effect
-        pos = (i + position) % LED_COUNT
-        dots[pos] = (brightness, 0, 0)
-    dots.show()
+    try:
+        brightness = int(abs(amplitude) * 255)
+        print(f"Updating LEDs - Amplitude: {amplitude}, Brightness: {brightness}, Position: {position}")
+        
+        for i in range(LED_COUNT):
+            # Create a moving wave effect
+            pos = (i + position) % LED_COUNT
+            dots[pos] = (brightness, 0, 0)
+        
+        dots.show()
+        print("LEDs updated successfully")
+    except Exception as e:
+        print(f"Error updating LEDs: {str(e)}")
 
 def main():
     # List available audio devices
@@ -43,6 +52,7 @@ def main():
         
         # Generate the continuous wave
         samples = generate_continuous_wave()
+        print("Generated audio samples")
         
         # Start the audio stream
         stream = sd.OutputStream(
@@ -51,6 +61,7 @@ def main():
             dtype='float32'
         )
         stream.start()
+        print("Audio stream started")
         
         print("Press Ctrl+C to stop")
         
@@ -76,8 +87,10 @@ def main():
             stream.stop()
             stream.close()
         # Turn off all LEDs
+        print("Turning off LEDs")
         dots.fill((0, 0, 0))
         dots.show()
+        print("LEDs turned off")
 
 if __name__ == "__main__":
     main()
