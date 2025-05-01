@@ -192,9 +192,11 @@ String theString4 = "";
 String theString5 = "";
 
 
+SecondDisplay displayTwo;
 
 void setup() {
-  size(displayWidth,displayHeight,P3D);
+  fullScreen(P3D, 1);
+  //size(4000,2500,P3D);
   
   //fullScreen(P3D);
   //surface.setSize(1920,1200);
@@ -236,7 +238,7 @@ void setup() {
   theOsc.plug(this, "teSoundWavesTwo", "/time");
   
   //----------------- Oscils wSerial Data Setup ------------------------
-  println(Serial.list());
+  printArray(Serial.list());
   
   thePort = new Serial(this, Serial.list()[1], 115200);
   thePort.bufferUntil('\n');
@@ -288,6 +290,9 @@ void setup() {
   nodeRadius, nodeRamp, nodeScale, nodeDamping,
   invertBackground, lineWeight, lineAlpha,
   drawX, drawY, drawZ, drawCurves, gridFiveBase);
+  
+  displayTwo = new SecondDisplay(this, 2, "Lissajous Window");
+  displayTwo.openFrame();
 }
 
 void draw() {
@@ -730,4 +735,79 @@ void keyPressed() {
     drawCurves = !drawCurves;
     drawLines = !drawCurves;
   }
+}
+
+
+
+
+
+class SecondDisplay extends PApplet {
+  int w, h;
+  int display;
+  PApplet parent;
+  PFont frameFont;
+  int l1 = 0;
+  int l2 = 1;
+  
+  public SecondDisplay(PApplet theParent, int theW, int theH, String theName) {
+    super();
+    parent = theParent;
+    w = theW;
+    h = theH;
+  }
+  
+  public SecondDisplay(PApplet theParent, int theDisplay, String theName) {
+    super();
+    parent = theParent;
+    display = theDisplay;
+  }
+  
+  public void settings() {
+    fullScreen(display);
+  }
+  
+  public void setup() {
+    frameFont = createFont("FreeSans.ttf", 40);
+    textFont(frameFont);
+    
+    background(0);
+    println("The width of the second display is: " + this.width);
+    println("The height of the second display is: " + this.height);
+  }
+  
+  public void openFrame() {
+    PApplet.runSketch(new String[]{this.getClass().getName()}, this);
+  }
+  
+  void draw() {
+    pushMatrix();
+    translate(0, 0);
+    stroke(0);
+    fill(0);
+    rect(0, 0, 4500, 2500);
+    popMatrix();
+    
+    fill(360);
+    noStroke();
+    text(sourceLabel, width-1700, height-1050);
+    text(sourceData, width-1700, height-1000);
+    
+    text(speciesLabel, width-1400, height-1135);
+    text(speciesData, width-1000, height-1135);
+    
+    text(output3Label, width-1700, height-500);
+    text(tree1Data, width-1400, height-500);
+    
+    text(output4Label, width-1700, height-300);
+    text(tree2Data, width-1400, height-300);
+    
+    text(output5Label, width-1700, height-100);
+    text(tree3Data, width-1400, height-100);
+  }
+  
+  public void customFunction() {
+    l1 = l1 + l2;
+  }
+  
+  
 }
