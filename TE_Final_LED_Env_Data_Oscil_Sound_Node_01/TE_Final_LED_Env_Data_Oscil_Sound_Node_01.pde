@@ -55,10 +55,10 @@ int bufferheight = 540;
 color[] defaultColors = {color(12,248,165)};
 color[] colors;
 
-int maxCount = 20;
-int xCount = 15;
+int maxCount = 25;
+int xCount = 22;
 int yCount = 1;
-int zCount = 1;
+int zCount = 2;
 
 //int theGridPos = height-theGrid;
 //  setParas(xCount,yCount,zCount, 45,200,100, 30,15, 100,3.125,1.325,0.7, false, 1,50, true,true,true, false);
@@ -68,7 +68,7 @@ int oldXCount = xCount;
 int oldYCount = yCount;
 int oldZCount = zCount;
 
-float gridStepX = 40;
+float gridStepX = 60;
 float gridStepY = 80;
 float gridStepZ = 100;
 float oldGridStepX = gridStepX;
@@ -141,7 +141,7 @@ String hData = "";
 String percentLabel = "%";
 
 String speciesLabel = "Species:";
-String speciesData = "Various";
+String speciesData = "Quercus alba";
 
 float soundDataOne = 0.0;
 float soundDataTwo = 0.0;
@@ -196,7 +196,7 @@ SecondDisplay displayTwo;
 
 void setup() {
   fullScreen(P3D, 1);
-  //size(4000,2500,P3D);
+  //size(3840,2160,P3D);
   
   //fullScreen(P3D);
   //surface.setSize(1920,1200);
@@ -238,10 +238,10 @@ void setup() {
   theOsc.plug(this, "teSoundWavesTwo", "/time");
   
   //----------------- Oscils wSerial Data Setup ------------------------
-  printArray(Serial.list());
+  //printArray(Serial.list());
   
-  thePort = new Serial(this, Serial.list()[1], 115200);
-  thePort.bufferUntil('\n');
+  //thePort = new Serial(this, Serial.list()[1], 115200);
+  //thePort.bufferUntil('\n');
   
   theMinim = new Minim(this);
   for (int i = 0; i < waveCount; i++) {
@@ -297,6 +297,7 @@ void setup() {
 
 void draw() {
   colorMode(HSB, 360, 100, 100, 100);
+  background(0);
   //color bgColor = color(360);
   color bgColor = color(0);
   color circleColor = color(0);
@@ -307,13 +308,13 @@ void draw() {
   
   time = second();
   
-  pushMatrix();
-  translate(-990,-620,-750);
-  noStroke();
-  //fill(bgColor, 5);
-  fill(bgColor);
-  rect(0,0,3900,2500);
-  popMatrix();
+  //pushMatrix();
+  //translate(-990,-620,-750);
+  //noStroke();
+  ////fill(bgColor, 5);
+  //fill(bgColor);
+  //rect(0,0,3900,2500);
+  //popMatrix();
   
   float mapData = map(soundDataOne, -30.0,30.0, height-1250,height-1450);
   float twoMapData = map(soundDataTwo, -30.0,30.0, height-950,height-1100);
@@ -345,6 +346,7 @@ void draw() {
   text(hData, width-1400, height-700);
   text(percentLabel, width-750, height-700);
   
+  /*
   textFont(ttlType, 36);
   
   text(sourceLabel, width-1700, height-1050);
@@ -361,7 +363,7 @@ void draw() {
   
   text(output5Label, width-1700, height-100);
   text(tree3Data, width-1400, height-100);
-  
+  */
   
   
   
@@ -388,16 +390,16 @@ void draw() {
   rotateX(rotationX);
   rotateY(rotationY);
   gridOne.updateTargets(mapData);
-  //gridOne.drawGrid();
+  gridOne.drawGrid();
   
   gridTwo.updateTargets(twoMapData);
-  //gridTwo.drawGrid();
+  gridTwo.drawGrid();
   
   gridThree.updateTargets(threeMapData);
-  //gridThree.drawGrid();
+  gridThree.drawGrid();
   
   gridFour.updateTargets(fourMapData);
-  //gridFour.drawGrid();
+  gridFour.drawGrid();
   
   gridFive.updateTargets(fiveMapData);
   gridFive.drawGrid();
@@ -767,7 +769,7 @@ class SecondDisplay extends PApplet {
   }
   
   public void setup() {
-    frameFont = createFont("FreeSans.ttf", 40);
+    frameFont = createFont("FreeSans", 40);
     textFont(frameFont);
     
     background(0);
@@ -780,6 +782,7 @@ class SecondDisplay extends PApplet {
   }
   
   void draw() {
+    colorMode(HSB, 360, 100,100,100);
     pushMatrix();
     translate(0, 0);
     stroke(0);
@@ -789,20 +792,20 @@ class SecondDisplay extends PApplet {
     
     fill(360);
     noStroke();
-    text(sourceLabel, width-1700, height-1050);
-    text(sourceData, width-1700, height-1000);
+    text(sourceLabel, 100, 150);
+    text(sourceData, 100, 200);
     
-    text(speciesLabel, width-1400, height-1135);
-    text(speciesData, width-1000, height-1135);
+    text(speciesLabel, 100, 335);
+    text(speciesData, 600, 335);
     
-    text(output3Label, width-1700, height-500);
-    text(tree1Data, width-1400, height-500);
+    text(output3Label, 100, 400);
+    text(tree1Data, 800, 400);
     
-    text(output4Label, width-1700, height-300);
-    text(tree2Data, width-1400, height-300);
+    text(output4Label, 100, 500);
+    text(tree2Data, 800, 500);
     
-    text(output5Label, width-1700, height-100);
-    text(tree3Data, width-1400, height-100);
+    text(output5Label, 100, 600);
+    text(tree3Data, 800, 600);
   }
   
   public void customFunction() {
