@@ -132,13 +132,13 @@ String tree2Data = "";
 String output5Label = "Tree Node 3 Output:";
 String tree3Data = "";
 
-String tempLabel = "Temperature Output:";
+String tempLabel = "Oxygen Output:";
 String tempData = "";
-String tLabel = "Celsius";
+String tLabel = "Ml";
 
-String hLabel = "Humidity Output:";
+String hLabel = "Current Output:";
 String hData = "";
-String percentLabel = "%";
+String percentLabel = "mV";
 
 String speciesLabel = "Species:";
 String speciesData = "Quercus alba";
@@ -153,9 +153,13 @@ float soundDataThree = 0;
 PFont ttlType;
 PFont sType;
 
-String credit1 = "Carlos Castellanos & Johnny DiBlasi";
-String credit2 = "Visualization & GPL License";
-String credit3 = "by Johnny DiBlasi";
+String credit1 = "Transcoded Ecologies is a hybrid biological-";
+String credit2 = "technological installation featuring a bio-driven ";
+String credit3 = "AI agent that generates various light wave ";
+String credit4 = "frequencies for a tree sapling network while ";
+String credit5 = "generating sound wave synthesizers along with ";
+String credit6 = "a data visualization composition in real-time.";
+String credit7 = "frequencies for a tree sapling network while generating sound wave synthesizers along with a data visualization composition in real-time. The work creates an immersive experience where chemical and physical biproducts of an array of plants or tree saplings is measured and assisted by a machine agent that has a model of optimum environmental and light conditions. The agent builds different contexts from climate data and biological cycles from time series of days, weeks, and years representing a time frame from a pre-industrial revolution framework. Climate and chemical data is also gathered from various natural ecosystems in and around the site of the installation space in order to superimpose the data to create a model of the microclimates in that given locality. An array of ‘tree nodes’ are each placed within their own metal frames. The frames suspend a large grow lightbox over each plant, and each tree node in the network gathers biodata such as CO2, temperature, light levels (visible and infrared), and electrical current measurements that is produced by the plants.";
 
 
 //------------------------Serial Output Globals--------------------------------
@@ -796,16 +800,19 @@ class SecondDisplay extends PApplet {
     text(sourceData, 100, 200);
     
     text(speciesLabel, 100, 335);
-    text(speciesData, 600, 335);
+    text(speciesData, 400, 335);
     
     text(output3Label, 100, 400);
-    text(tree1Data, 800, 400);
+    text(tree1Data, 400, 400);
     
     text(output4Label, 100, 500);
-    text(tree2Data, 800, 500);
+    text(tree2Data, 400, 500);
     
     text(output5Label, 100, 600);
-    text(tree3Data, 800, 600);
+    text(tree3Data, 400, 600);
+    
+    textFont(frameFont, 24);
+    text(credit1, 600, 150);
   }
   
   public void customFunction() {
