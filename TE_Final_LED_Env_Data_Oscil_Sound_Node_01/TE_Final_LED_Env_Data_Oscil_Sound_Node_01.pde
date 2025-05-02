@@ -121,7 +121,7 @@ PImage planet;
 
 String labelOne = "";
 String sourceLabel = "Data source(s):";
-String sourceData = "CO2 / Temperature / Humidity";
+String sourceData = "Oxygen / Electrical Current / Temperature";
 
 String output3Label = "Tree Node 1 Output:";
 String tree1Data = "";
@@ -811,8 +811,17 @@ class SecondDisplay extends PApplet {
     text(output5Label, 100, 600);
     text(tree3Data, 400, 600);
     
+    strokeWeight(1);
+    stroke(360);
+    noFill();
+    rect(625, 110, 550, 230);
     textFont(frameFont, 24);
-    text(credit1, 600, 150);
+    text(credit1, 650, 150);
+    text(credit2, 650, 180);
+    text(credit3, 650, 210);
+    text(credit4, 650, 240);
+    text(credit5, 650, 270);
+    text(credit6, 650, 300);
   }
   
   public void customFunction() {
